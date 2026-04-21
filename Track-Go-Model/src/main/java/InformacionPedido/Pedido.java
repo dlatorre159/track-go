@@ -47,8 +47,19 @@ public class Pedido implements Actualizable, Consultable, Trazable{
         this.historialDePedido = new ArrayList<>();
     }
 
+     // Constructor vacío
+    public Pedido() {
+        this.detalleDePedido = new ArrayList<>();
+        this.historialDePedido = new ArrayList<>();
+        this.detalleTransporte = null;
+    }
+
     public String getIdPedido(){
         return this.idPedido;
+    }
+
+    public void setIdPedido(String idPedido) {
+        this.idPedido = idPedido;
     }
 
     public void setDestinatario(String destinatario) {
@@ -61,6 +72,18 @@ public class Pedido implements Actualizable, Consultable, Trazable{
 
     public Date getFechaCreacion(){
         return fechaCreacion;
+    }
+
+    public void setFechaCreacion(Date fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public Date getFechaActualizacion() {
+        return fechaActualizacion;
+    }
+
+    public void setFechaActualizacion(Date fechaActualizacion) {
+        this.fechaActualizacion = fechaActualizacion;
     }
 
     public double getTarifaEnvio(){
@@ -77,6 +100,10 @@ public class Pedido implements Actualizable, Consultable, Trazable{
 
     public ArrayList<DetalleDePedido> getDetalleDePedido(){
         return detalleDePedido;
+    }
+
+    public void setDetalleDePedido(ArrayList<DetalleDePedido> detalleDePedido) {
+        this.detalleDePedido = detalleDePedido;
     }
 
     public Transporte getDetalleTransporte(){
@@ -105,6 +132,10 @@ public class Pedido implements Actualizable, Consultable, Trazable{
 
     public ArrayList<HistorialDePedido> getHistorialDePedido(){
         return historialDePedido;
+    }
+
+    public void setHistorialDePedido(ArrayList<HistorialDePedido> historialDePedido) {
+        this.historialDePedido = historialDePedido;
     }
 
     public void setEmpresaDeOrigen(Empresa empresaDeOrigen) {
