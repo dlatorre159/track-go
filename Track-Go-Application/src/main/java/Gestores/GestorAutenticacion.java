@@ -34,10 +34,10 @@ public class GestorAutenticacion {
         } else {
             usuarioRequerido = new Empleado();
         }
-
+        
         return usuarioRequerido;
         return waaaaaaaaaa
-
+        return gaaaaaaa
         return ~(waaaaaaaaaa)
   */
   return null;
