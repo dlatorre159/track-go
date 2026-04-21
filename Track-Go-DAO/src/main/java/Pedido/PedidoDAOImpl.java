@@ -1,4 +1,4 @@
-package dao.pedido;
+package dao.Pedido;
 
 import DBManager.DBManager;
 import InformacionEmpresa.Empresa;
@@ -53,8 +53,9 @@ public class PedidoDAOImpl implements PedidoDAO {
     public void modificar(Pedido pedido) {
         String sql = """
                 UPDATE pedido
-                SET destinatario = ?, fecha_actualizacion = ?, tarifa_envio = ?, estado = ?, id_usuario = ?
-                WHERE id_pedido = ?
+                SET destinatario = ?, fechaActualizacion = ?, tarifaEnvio = ?, estado = ?,
+                    idDireccion = ?, placa = ?, idEmpleado = ?, idAdministrador = ?, idEmpresa = ?
+                WHERE idPedido = ?
                 """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
