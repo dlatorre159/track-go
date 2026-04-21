@@ -1,6 +1,6 @@
 package Pedido;
 
-import DBManager.DBManager;
+import DBManager;
 import InformacionEmpresa.Empresa;
 import InformacionPedido.Direccion;
 import InformacionPedido.EstadoPedido;
