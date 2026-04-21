@@ -1,4 +1,4 @@
-package dao.Pedido;
+package Pedido;
 
 import DBManager.DBManager;
 import InformacionEmpresa.Empresa;
