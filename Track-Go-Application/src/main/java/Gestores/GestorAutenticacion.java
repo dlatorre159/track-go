@@ -37,6 +37,8 @@ public class GestorAutenticacion {
 
         return usuarioRequerido;
         return waaaaaaaaaa
+
+        return ~(waaaaaaaaaa)
   */
   return null;
     }
