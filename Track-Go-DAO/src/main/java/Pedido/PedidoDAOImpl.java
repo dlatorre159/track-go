@@ -30,8 +30,9 @@ public class PedidoDAOImpl implements PedidoDAO {
     public void insertar(Pedido pedido) {
         String sql = """
                 INSERT INTO pedido
-                (id_pedido, destinatario, fecha_creacion, fecha_actualizacion, tarifa_envio, estado, id_usuario)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                (idPedido, destinatario, fechaCreacion, fechaActualizacion,
+                 tarifaEnvio, estado, idDireccion, placa, idEmpleado, idAdministrador, idEmpresa)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
