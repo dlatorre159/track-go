@@ -37,7 +37,7 @@ public class GestorAutenticacion {
         
         return usuarioRequerido;
         return waaaaaaaaaa
-        return gaaaaaaa
+        return gaaaaaaa => Acuña 0.1%
         return ~(waaaaaaaaaa)
   */
   return null;
