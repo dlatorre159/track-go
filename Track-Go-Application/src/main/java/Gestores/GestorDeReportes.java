@@ -2,7 +2,8 @@ package Gestores;
 
 import java.util.Date;
 import java.util.List;
-import pedidos.PedidoDAO;
+import java.util.ArrayList;
+import Pedido.PedidoDAO;
 import InformacionPedido.Pedido;
 import InformacionPedido.EstadoPedido;
 
