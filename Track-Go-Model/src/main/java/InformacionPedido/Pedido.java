@@ -215,4 +215,60 @@ public class Pedido implements Actualizable, Consultable, Trazable{
         EstadoPedido estadoActual = historial.getEstado();
         return estadoActual.ordinal();
     }
+
+    @Override
+    public String toString() {
+
+        String transporteStr;
+        if (detalleTransporte != null) {
+            transporteStr = detalleTransporte.getPlaca();
+        } else {
+            transporteStr = "SIN TRANSPORTE";
+        }
+
+        String direccionStr;
+        if (direccion != null) {
+            direccionStr = direccion.getDepartamento() + " - " +
+                    direccion.getProvincia() + " - " +
+                    direccion.getDistrito();
+        } else {
+            direccionStr = "SIN DIRECCION";
+        }
+
+        String empresaStr;
+        if (empresaDeOrigen != null) {
+            empresaStr = empresaDeOrigen.getNombre();
+        } else {
+            empresaStr = "SIN EMPRESA";
+        }
+
+        String historialStr;
+        if (historialDePedido != null && !historialDePedido.isEmpty()) {
+            historialStr = "Total eventos: " + historialDePedido.size();
+        } else {
+            historialStr = "SIN HISTORIAL";
+        }
+
+        String detallesStr;
+        if (detalleDePedido != null && !detalleDePedido.isEmpty()) {
+            detallesStr = "Items: " + detalleDePedido.size();
+        } else {
+            detallesStr = "SIN DETALLES";
+        }
+
+        return "================ PEDIDO ================\n" +
+                "ID Pedido: " + idPedido + "\n" +
+                "Destinatario: " + destinatario + "\n" +
+                "Fecha Creación: " + fechaCreacion + "\n" +
+                "Última Actualización: " + fechaActualizacion + "\n" +
+                "Tarifa Envío: " + tarifaEnvio + "\n" +
+                "Estado: " + estado + "\n" +
+                "Dirección: " + direccionStr + "\n" +
+                "Empresa Origen: " + empresaStr + "\n" +
+                "Transporte: " + transporteStr + "\n" +
+                "Usuario ID: " + idUsuario + "\n" +
+                "Detalles: " + detallesStr + "\n" +
+                "Historial: " + historialStr +
+                "\n========================================";
+    }
 }

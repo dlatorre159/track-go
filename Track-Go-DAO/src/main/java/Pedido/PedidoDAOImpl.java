@@ -59,15 +59,14 @@ public class PedidoDAOImpl implements PedidoDAO {
         pedido.setEmpresaDeOrigen(empresaBD);
 
         String sql = """
-            INSERT INTO pedido (
-                idPedido,
-                destinatario,
-                fechaCreacion,
-                fechaActualizacion,
-                tarifaEnvio,
-                estado,
-                idDireccion,
-                idEmpresa
+            INSERT INTO pedido (idPedido,
+                                destinatario,
+                                fechaCreacion,
+                                fechaActualizacion,
+                                tarifaEnvio,
+                                estado,
+                                idDireccion,
+                                idEmpresa
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """;
@@ -90,6 +89,28 @@ public class PedidoDAOImpl implements PedidoDAO {
 
     @Override
     public void modificarPedido(Pedido pedido) {
+        //Se ve lo de la Direccion
+        Direccion direccion = pedido.getDireccion();
+
+        int idDireccion = DireccionDAOImpl.getInstance().insertOrGetDireccion(
+                direccion.getDepartamento(),
+                direccion.getProvincia(),
+                direccion.getDistrito(),
+                direccion.getCodPostal(),
+                direccion.getCalleNumero(),
+                direccion.getReferencia()
+        );
+        //Vemos lo de la Empresa
+        Empresa empresaBD = EmpresaDAOImpl.getInstance()
+                .consultarEmpresa(pedido.getEmpresaDeOrigen().getRuc());
+
+        if (empresaBD == null) {
+            EmpresaDAOImpl.getInstance().AgregarEmpresa(pedido.getEmpresaDeOrigen());
+            empresaBD = EmpresaDAOImpl.getInstance()
+                    .consultarEmpresa(pedido.getEmpresaDeOrigen().getRuc());
+        }
+        pedido.setEmpresaDeOrigen(empresaBD);
+
         /**
          *                 idPedido,
          *                 destinatario,
@@ -102,19 +123,36 @@ public class PedidoDAOImpl implements PedidoDAO {
          * */
         String sql = """
                 UPDATE pedido
-                SET destinatario = ?, fechaCreacion = ?, fechaActualizacion = ?, tarifaEnvio = ?, estado = ?, idEmpresa = ?
+                SET destinatario = ?,
+                    fechaActualizacion = ?,
+                    tarifaEnvio = ?,
+                    estado = ?,
+                    idDireccion = ?,
+                    placa = ?,
+                    idEmpresa = ?,
+                    idEmpleado = ?,
+                    idAdministrador = ?
                 WHERE idPedido = ?
                 """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, pedido.getDestinatario());
-            ps.setDate(2, new Date(pedido.getFechaActualizacion().getTime()));
-            ps.setDate(3, new java.sql.Date(pedido.getFechaActualizacion().getTime()));
-            ps.setDouble(4, pedido.getTarifaEnvio());
-            ps.setString(5, pedido.getEstado().name());
-            ps.setInt(6, pedido.getEmpresaDeOrigen().getId());
-            ps.setString(7, pedido.getIdPedido());
 
+            ps.setString(1, pedido.getDestinatario());
+            ps.setDate(2, new java.sql.Date(pedido.getFechaActualizacion().getTime()));
+            ps.setDouble(3, pedido.getTarifaEnvio());
+            ps.setString(4, pedido.getEstado().name());
+
+            ps.setInt(5, idDireccion);
+
+            if (pedido.getDetalleTransporte() != null) {
+                ps.setString(6, pedido.getDetalleTransporte().getPlaca());
+            } else {
+                ps.setNull(6, java.sql.Types.VARCHAR);
+            }
+            ps.setInt(7, empresaBD.getId());
+            ps.setNull(8, java.sql.Types.INTEGER);
+            ps.setNull(9, java.sql.Types.INTEGER);
+            ps.setString(10, pedido.getIdPedido());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -127,7 +165,12 @@ public class PedidoDAOImpl implements PedidoDAO {
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, idPedido);
-            ps.executeUpdate();
+            int filasAfectadas=ps.executeUpdate();
+            if (filasAfectadas>0){
+                System.out.println("Pedido eliminado correctamente: " + idPedido);
+            }else{
+                System.out.println("No se encontró el pedido a Eliminar: " + idPedido);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -177,7 +220,7 @@ public class PedidoDAOImpl implements PedidoDAO {
 
         String sql = """
             SELECT * FROM pedido
-            WHERE DATE(fecha_creacion) = ?
+            WHERE DATE(fechaCreacion) = ?
             """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -200,7 +243,7 @@ public class PedidoDAOImpl implements PedidoDAO {
         ArrayList<Pedido> pedidos = new ArrayList<>();
         String sql = """
                 SELECT * FROM pedido
-                WHERE fecha_creacion BETWEEN ? AND ?
+                WHERE fechaCreacion BETWEEN ? AND ?
                 """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -242,7 +285,7 @@ public class PedidoDAOImpl implements PedidoDAO {
     @Override
     public ArrayList<Pedido> listarPorUsuario(int idUsuario) {
         ArrayList<Pedido> pedidos = new ArrayList<>();
-        String sql = "SELECT * FROM pedido WHERE id_usuario = ?";
+        String sql = "SELECT * FROM pedido WHERE idUsuario = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, idUsuario);
@@ -264,21 +307,33 @@ public class PedidoDAOImpl implements PedidoDAO {
     }
 
     private Pedido mapearPedido(ResultSet rs) throws SQLException {
+
         Pedido pedido = new Pedido();
 
         pedido.setIdPedido(rs.getString("idPedido"));
         pedido.setDestinatario(rs.getString("destinatario"));
+
         pedido.setFechaCreacion(rs.getDate("fechaCreacion"));
         pedido.setFechaActualizacion(rs.getDate("fechaActualizacion"));
-        pedido.setTarifaEnvio(rs.getDouble("fechaActualizacion"));
-        pedido.setEstado(EstadoPedido.valueOf(rs.getString("estado")));
-        pedido.setIdUsuario(rs.getInt("idUsuario"));
 
-        // Temporalmente null hasta implementar otros DAO
-        Direccion direccion = null;
-        Empresa empresa = null;
-        pedido.setDireccion(direccion);
-        pedido.setEmpresaDeOrigen(empresa);
+        pedido.setTarifaEnvio(rs.getDouble("tarifaEnvio"));
+        pedido.setEstado(EstadoPedido.valueOf(rs.getString("estado")));
+
+        pedido.setIdUsuario(rs.getInt("idEmpleado"));
+
+        // Por ahora null
+        pedido.setDireccion(null);
+        pedido.setEmpresaDeOrigen(null);
+
+        String placa = rs.getString("placa");
+        if (placa != null) {
+            Transporte transporte = TransporteDAOImpl.getInstance()
+                    .buscarDetallesTransporte(placa);
+
+            pedido.setDetalleTransporte(transporte);
+        } else {
+            pedido.setDetalleTransporte(null);
+        }
 
         return pedido;
     }

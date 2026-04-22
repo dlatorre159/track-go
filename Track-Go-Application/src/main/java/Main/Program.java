@@ -15,11 +15,13 @@ import java.util.ArrayList;
 
 public class Program {
     public static void main(String[] args) {
+
         DBManager.getInstance();
 
         EmpresaDAO empresaDAO = EmpresaDAOImpl.getInstance();
         TransporteDAO transporteDAO = TransporteDAOImpl.getInstance();
-
+        PedidoDAO pedidoDAO = PedidoDAOImpl.getInstance();
+        String idPedido= null;
         String ruc="123456789";
         String placa1 = "TRR-001";
         String placa2 = "TRR-002";
@@ -104,7 +106,7 @@ public class Program {
                 System.out.println(tr);
             }
 
-            // Mostramos que si se Deletea
+            // Borramos uno
             transporteDAO.EliminarTransporte(placa1);
             System.out.println("\nSe eliminó: " + placa1);
 
@@ -114,13 +116,70 @@ public class Program {
                 System.out.println(tr);
             }
 
+            //PEDIDO
+
+            System.out.println("\n=== PEDIDO ===");
+            Direccion direccion = new Direccion(
+                    "Lima",
+                    "Lima",
+                    "San Miguel",
+                    "15087",
+                    "Av. La Marina 123",
+                    "Frente a la UNI"
+            );
+            Empresa empresaOrigen = empresaDAO.consultarEmpresa(ruc);
+
+            Pedido pedido = new Pedido(
+                    "Juan Perez",
+                    25.50,
+                    EstadoPedido.EN_AGENCIA,
+                    1,
+                    direccion,
+                    empresaOrigen
+            );
+
+            //CREATE
+
+            pedidoDAO.insertarPedido(pedido);
+            idPedido = pedido.getIdPedido();
+            System.out.println("Pedido creado: " + pedido.getIdPedido());
+
+            // READ
+            Pedido pedidoBD = pedidoDAO.obtenerPorId(pedido.getIdPedido());
+            System.out.println("Pedido leído:");
+            System.out.println(pedidoBD);
+
+            // UPDATE sin transporte
+            pedido.setDestinatario("Juan Perez Actualizado");
+            pedido.setTarifaEnvio(35.00);
+            pedido.setEstado(EstadoPedido.SALIDA_A_RUTA);
+
+            pedidoDAO.modificarPedido(pedido);
+            System.out.println("Pedido actualizado sin transporte");
+
+            // ASIGNAR TRANSPORTE
+            Transporte transporteAsignado = transporteDAO.buscarDetallesTransporte(placa2);
+            pedido.setDetalleTransporte(transporteAsignado);
+
+            // UPDATE con transporte
+            pedidoDAO.modificarPedido(pedido);
+            System.out.println("Pedido actualizado con transporte");
+
+            // READ FINAL
+            System.out.println("Pedido final:");
+            System.out.println(pedidoDAO.obtenerPorId(pedido.getIdPedido()));
+
+
         } finally {
             empresaDAO.EliminarEmpresa(ruc);
             transporteDAO.EliminarTransporte("TRR-002");
             transporteDAO.EliminarTransporte("TRR-003");
+            if (idPedido != null) {
+                pedidoDAO.eliminarPedido(idPedido);
+            }
+            System.out.println("\nLimpieza final Completada");
             DBManager.closeConnection();
 
-            System.out.println("\nLimpieza final Completada");
         }
 
     }

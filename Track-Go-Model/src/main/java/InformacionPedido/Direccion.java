@@ -65,4 +65,34 @@ public class Direccion {
     public void setReferencia(String referencia){
         this.referencia = referencia;
     }
+
+    @Override
+    public String toString() {
+
+        String dep;
+        if (departamento != null) dep = departamento;
+        else dep = "SIN DEP";
+
+        String prov;
+        if (provincia != null) prov = provincia;
+        else prov = "SIN PROV";
+
+        String dist;
+        if (distrito != null) dist = distrito;
+        else dist = "SIN DIST";
+
+        String calle;
+        if (calleNumero != null) calle = calleNumero;
+        else calle = "SIN CALLE";
+
+        String ref;
+        if (referencia != null) ref = referencia;
+        else ref = "SIN REFERENCIA";
+
+        return "=== DIRECCION ===\n" +
+                dep + " - " + prov + " - " + dist + "\n" +
+                calle + "\n" +
+                ref +
+                "\n=================";
+    }
 }
