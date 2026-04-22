@@ -1,23 +1,12 @@
 package Transporte;
 
 import InformacionPedido.Transporte;
-import java.util.List;
-
-
+import java.util.ArrayList;
 
 public interface TransporteDAO {
-
-    void insertar(Transporte transporte);
-
-
-    void modificar(Transporte transporte);
-
-
-    void eliminar(String placa);
-
-
-    Transporte obtenerPorId(String placa);
-
-
-    List<Transporte> listarTodos();
+    void AgregarTransporte(Transporte transporte);
+    void ModificarTransporte(String placa, Transporte transporte);
+    void EliminarTransporte(String placa);
+    Transporte buscarDetallesTransporte(String placa);
+    ArrayList<Transporte> obtenerTodosLosTransportes();
 }

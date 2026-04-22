@@ -6,6 +6,8 @@ public class Transporte {
     private String marca;
     private String modelo;
 
+    public Transporte(){};
+
     public Transporte(String placa, String tipo, String marca, String modelo){
         this.placa = placa;
         this.tipo = tipo;
@@ -43,5 +45,15 @@ public class Transporte {
 
     public void setModelo(String modelo){
         this.modelo = modelo;
+    }
+
+    @Override
+    public String toString() {
+        return "\n-- TRANSPORTE --" +
+                "\nPlaca: " + placa +
+                "\nTipo: " + tipo +
+                "\nMarca: " + marca +
+                "\nModelo: " + modelo +
+                "\n---------";
     }
 }

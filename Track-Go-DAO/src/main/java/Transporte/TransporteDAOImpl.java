@@ -1,125 +1,131 @@
 package Transporte;
-
-import Manager.DBManager;
 import InformacionPedido.Transporte;
-
+import Manager.DBManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.List;
 
 public class TransporteDAOImpl implements TransporteDAO {
-    public TransporteDAOImpl() {}
+    private static TransporteDAOImpl instance;
+    private static Connection connection;
 
-    @Override
-    public void insertar(Transporte transporte) {
-        String sql = """
-                INSERT INTO transporte (placa, tipo, marca, modelo)
-                VALUES (?, ?, ?, ?)
-                """;
-        try (Connection conn = DBManager.getInstance().getConnection();
-             PreparedStatement cmd = conn.prepareStatement(sql)) {
-
-            cmd.setString(1, transporte.getPlaca());
-            cmd.setString(2, transporte.getTipo());
-            cmd.setString(3, transporte.getMarca());
-            cmd.setString(4, transporte.getModelo());
-            cmd.executeUpdate();
-
-        } catch (SQLException e) {
-            System.err.println("Error al insertar transporte: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
+    private TransporteDAOImpl() {
+        connection = DBManager.getInstance().getConnection();
     }
 
-    @Override
-    public void modificar(Transporte transporte) {
-        String sql = """
-                UPDATE transporte
-                SET tipo   = ?,
-                    marca  = ?,
-                    modelo = ?
-                WHERE placa = ?
-                """;
-        try (Connection conn = DBManager.getInstance().getConnection();
-             PreparedStatement cmd = conn.prepareStatement(sql)) {
-
-            cmd.setString(1, transporte.getTipo());
-            cmd.setString(2, transporte.getMarca());
-            cmd.setString(3, transporte.getModelo());
-            cmd.setString(4, transporte.getPlaca());  // WHERE al final
-            cmd.executeUpdate();
-
-        } catch (SQLException e) {
-            System.err.println("Error al modificar transporte: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void eliminar(String placa) {
-        String sql = "DELETE FROM transporte WHERE placa = ?";
-        try (Connection conn = DBManager.getInstance().getConnection();
-             PreparedStatement cmd = conn.prepareStatement(sql)) {
-
-            cmd.setString(1, placa);
-            cmd.executeUpdate();
-
-        } catch (SQLException e) {
-            System.err.println("Error al eliminar transporte: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public Transporte obtenerPorId(String placa) {
-        String sql = "SELECT * FROM transporte WHERE placa = ?";
-        try (Connection conn = DBManager.getInstance().getConnection();
-             PreparedStatement cmd = conn.prepareStatement(sql)) {
-
-            cmd.setString(1, placa);
-            try (ResultSet rs = cmd.executeQuery()) {
-                if (rs.next()) {
-                    return mapearTransporte(rs);
-                }
+    public static TransporteDAOImpl getInstance() {
+        if (instance == null) {
+            synchronized (TransporteDAOImpl.class) {
+                instance = new TransporteDAOImpl();
             }
+        }
+        return instance;
+    }
 
+    @Override
+    public void AgregarTransporte(Transporte transporte) {
+        String sql = "INSERT INTO transporte (placa,tipo,marca, modelo) VALUES (?,?,?,?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, transporte.getPlaca());
+            stmt.setString(2, transporte.getTipo());
+            stmt.setString(3, transporte.getMarca());
+            stmt.setString(4, transporte.getModelo());
+            int filasAfectadas = stmt.executeUpdate();
+            if (filasAfectadas == 1) {
+                System.out.println("Se ha agregado un transporte");
+            } else {
+                System.out.println("Se han agregado" + filasAfectadas + "transportes");
+            }
         } catch (SQLException e) {
-            System.err.println("Error al obtener transporte: " + e.getMessage());
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            System.out.println("No se ha podido agregar ningún transporte");
+        }
+    }
+
+    @Override
+    public void ModificarTransporte(String placa, Transporte transporte) {
+        String sql = "UPDATE transporte SET placa = ?, tipo = ?, marca = ?, modelo = ? " +
+                "WHERE placa = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, transporte.getPlaca());
+            stmt.setString(2, transporte.getTipo());
+            stmt.setString(3, transporte.getMarca());
+            stmt.setString(4, transporte.getModelo());
+            stmt.setString(5, placa);
+            int filasAfectadas = stmt.executeUpdate();
+            if (filasAfectadas == 1) {
+                System.out.println("Se ha modificado un transporte");
+            } else {
+                System.out.println("Se han modificado" + filasAfectadas + "transportes");
+            }
+        } catch (SQLException e) {
+            System.out.println("No se ha podido modificar ningún transporte");
+        }
+    }
+
+    @Override
+    public void EliminarTransporte(String placa) {
+        String sql = "DELETE FROM transporte WHERE placa = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, placa);
+            int filasAfectadas = stmt.executeUpdate();
+            if (filasAfectadas == 1) {
+                System.out.println("Se ha eliminado un transporte");
+            } else {
+                System.out.println("Se han eliminado" + filasAfectadas + "transportes");
+            }
+        } catch (SQLException e) {
+            System.out.println("No se ha podido eliminar ningún transporte");
+        }
+    }
+
+    @Override
+    public Transporte buscarDetallesTransporte(String placa) {
+        Transporte aux = new Transporte();
+        String sql = "SELECT * FROM transporte WHERE placa = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, placa);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                aux.setPlaca(placa);
+                aux.setTipo(rs.getString("tipo"));
+                aux.setMarca(rs.getString("marca"));
+                aux.setModelo(rs.getString("modelo"));
+
+            } else {
+                System.out.println("No se encontró el transporte con placa: " + placa);
+                return null;
+            }
+            rs.close();
+            return aux;
+        } catch (SQLException e) {
+            System.out.println("Error al buscar el transporte con placa" + placa);
         }
         return null;
     }
 
     @Override
-    public List<Transporte> listarTodos() {
+    public ArrayList<Transporte> obtenerTodosLosTransportes(){
+        ArrayList<Transporte> transportesAux = new ArrayList<>();
         String sql = "SELECT * FROM transporte";
-        List<Transporte> transportes = new ArrayList<>();
-        try (Connection conn = DBManager.getInstance().getConnection();
-             PreparedStatement cmd = conn.prepareStatement(sql);
-             ResultSet rs = cmd.executeQuery()) {
-
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                transportes.add(mapearTransporte(rs));
+                Transporte aux = new Transporte();
+                aux.setPlaca(rs.getString("placa"));
+                aux.setTipo(rs.getString("tipo"));
+                aux.setMarca(rs.getString("marca"));
+                aux.setModelo(rs.getString("modelo"));
+                transportesAux.add(aux);
+
             }
-
+            rs.close();
+            return transportesAux;
         } catch (SQLException e) {
-            System.err.println("Error al listar transportes: " + e.getMessage());
-            throw new RuntimeException(e);
+            System.out.println("Error al buscar los transportes");
         }
-        return transportes;
+        return null;
     }
-
-    private Transporte mapearTransporte(ResultSet rs) throws SQLException {
-        return new Transporte(
-                rs.getString("placa"),
-                rs.getString("tipo"),
-                rs.getString("marca"),
-                rs.getString("modelo")
-        );
-    }
-
 }

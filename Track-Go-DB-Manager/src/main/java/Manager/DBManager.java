@@ -23,6 +23,9 @@ public class DBManager{
         this.usuario = db.getString("db.usuario");
         this.password = db.getString("db.password");
 
+        System.out.println(this.host);
+        System.out.println(this.password);
+
         String url = "jdbc:mysql://" + this.host + ":" + this.port + "/" + this.esquema;
 
         try{
@@ -31,7 +34,8 @@ public class DBManager{
                 System.out.println("Conexión exitosa a la Base de Datos");
             }
         }catch (SQLException e){
-            System.out.println("Error al conectar con la Base de Datos");
+            e.printStackTrace();
+            System.out.println("Error al conectar con la Base de Datos" );
         }
     }
 

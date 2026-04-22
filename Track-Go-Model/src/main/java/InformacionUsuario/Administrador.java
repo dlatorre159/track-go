@@ -4,6 +4,10 @@ public class Administrador extends Usuario{
     private String nivelDeAcceso;
     private boolean isManager;
 
+    public Administrador(){
+        super();
+    };
+
     public Administrador(String codigoEmpleado, String dni, String nombres, String apellidos, String correo,
                          String contrasenhaHash, String telefono, String nivelDeAcceso){
         super(codigoEmpleado,dni,nombres,apellidos,correo,contrasenhaHash,telefono,Cargo.ADMINISTRADOR);

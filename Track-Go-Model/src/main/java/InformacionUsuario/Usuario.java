@@ -17,6 +17,10 @@ public abstract class Usuario implements Consultable {
     private boolean estado;
     private Cargo cargo;
 
+    public Usuario(){
+
+    }
+
     public Usuario(String codigoEmpleado, String dni, String nombres, String apellidos, String correo, String contrasenhaHash, String telefono, Cargo cargo){
         this.idUsuario = -1;
         this.codigoEmpleado = codigoEmpleado;

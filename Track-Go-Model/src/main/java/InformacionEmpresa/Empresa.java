@@ -2,7 +2,7 @@ package InformacionEmpresa;
 import java.util.Date;
 
 public class Empresa {
-    private static int idEmpresa = 0;
+    private int idEmpresa;
     private String nombre;
     private String ruc;
     private String direccion;
@@ -11,7 +11,6 @@ public class Empresa {
 
     public Empresa(String nombre, String ruc, String direccion, String sector,
                    Date fechaFundacion){
-        idEmpresa++;
         this.nombre = nombre;
         this.ruc = ruc;
         this.direccion = direccion;
@@ -20,11 +19,16 @@ public class Empresa {
     }
 
     public Empresa(Empresa empresa){
+        this.idEmpresa=empresa.idEmpresa;
         this.nombre = empresa.nombre;
         this.ruc = empresa.ruc;
         this.direccion = empresa.direccion;
         this.sector = empresa.sector;
         this.fechaFundacion = empresa.fechaFundacion;
+    }
+
+    public void setId(int id){
+        idEmpresa = id;
     }
 
     public int getId(){
@@ -69,5 +73,13 @@ public class Empresa {
 
     public void setFechaFundacion(Date fechaFundacion){
         this.fechaFundacion = fechaFundacion;
+    }
+
+
+    //CAMBIO??
+    @Override
+    public String toString() {
+        return "\n--- EMPRESA ---" + "\nID: " + idEmpresa + "\nNombre: " + nombre + "\nRUC: " + ruc + "\nDirección: " + direccion +
+                "\nSector: " + sector + "\nFecha Fundación: " + fechaFundacion + "\n------";
     }
 }

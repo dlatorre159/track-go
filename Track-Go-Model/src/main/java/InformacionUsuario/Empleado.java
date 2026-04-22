@@ -4,6 +4,10 @@ public class Empleado extends Usuario {
     private String licencia;
     private Turno turno;
 
+    public Empleado(){
+        super();
+    }
+
     public Empleado(String codigoEmpleado, String dni, String nombres, String apellidos, String correo, String contrasenhaHash, String telefono, Cargo cargo, String licencia, Turno turno) {
         super(codigoEmpleado, dni, nombres, apellidos, correo, contrasenhaHash, telefono, cargo);
         this.licencia = licencia;

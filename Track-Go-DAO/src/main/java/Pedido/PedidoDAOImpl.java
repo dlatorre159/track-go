@@ -1,10 +1,14 @@
 package Pedido;
 
+import InformacionPedido.Transporte;
 import Manager.DBManager;
 import InformacionEmpresa.Empresa;
 import InformacionPedido.Direccion;
 import InformacionPedido.EstadoPedido;
 import InformacionPedido.Pedido;
+import Direccion.DireccionDAOImpl;
+import Transporte.TransporteDAOImpl;
+import Empresa.EmpresaDAOImpl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,50 +16,92 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.List;
 
 public class PedidoDAOImpl implements PedidoDAO {
+    private static PedidoDAOImpl instance;
+    private static Connection connection;
 
-    private Connection connection;
+    private PedidoDAOImpl(){
+        connection = DBManager.getInstance().getConnection();
+    }
 
-    public PedidoDAOImpl() {
-        try {
-            this.connection = DBManager.getInstance().getConnection();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static PedidoDAOImpl getInstance(){
+        if(instance == null) {
+            synchronized (PedidoDAOImpl.class) {
+                instance = new PedidoDAOImpl();
+            }
         }
+        return instance;
     }
 
     @Override
-    public void insertar(Pedido pedido) {
+    public void insertarPedido(Pedido pedido) {
+        Direccion direccion = pedido.getDireccion();
+
+        int idDireccion = DireccionDAOImpl.getInstance().insertOrGetDireccion(
+                direccion.getDepartamento(),
+                direccion.getProvincia(),
+                direccion.getDistrito(),
+                direccion.getCodPostal(),
+                direccion.getCalleNumero(),
+                direccion.getReferencia()
+        );
+
+        Empresa empresaIngresada = pedido.getEmpresaDeOrigen();
+        Empresa existeEmpresa = EmpresaDAOImpl.getInstance().consultarEmpresa(empresaIngresada.getRuc());
+
+        if (existeEmpresa == null) {
+            EmpresaDAOImpl.getInstance().AgregarEmpresa(empresaIngresada);
+            pedido.setEmpresaDeOrigen(empresaIngresada);
+        } else {
+            pedido.setEmpresaDeOrigen(existeEmpresa);
+        }
+
         String sql = """
-                INSERT INTO pedido
-                (idPedido, destinatario, fechaCreacion, fechaActualizacion,
-                 tarifaEnvio, estado, idDireccion, placa, idEmpleado, idAdministrador, idEmpresa)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """;
+            INSERT INTO pedido (
+                idPedido,
+                destinatario,
+                fechaCreacion,
+                fechaActualizacion,
+                tarifaEnvio,
+                estado,
+                idDireccion,
+                idEmpresa
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, pedido.getIdPedido());
-            ps.setString(2, pedido.getDestinatario());
-            ps.setDate(3, new Date(pedido.getFechaCreacion().getTime()));
-            ps.setDate(4, new Date(pedido.getFechaActualizacion().getTime()));
-            ps.setDouble(5, pedido.getTarifaEnvio());
-            ps.setString(6, pedido.getEstado().name());
-            ps.setInt(7, pedido.getIdUsuario());
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, pedido.getIdPedido());
+            stmt.setString(2, pedido.getDestinatario());
+            stmt.setDate(3, new java.sql.Date(pedido.getFechaCreacion().getTime()));
+            stmt.setDate(4, new java.sql.Date(pedido.getFechaActualizacion().getTime()));
+            stmt.setDouble(5, pedido.getTarifaEnvio());
+            stmt.setString(6, pedido.getEstado().name());
+            stmt.setInt(7, idDireccion);
+            stmt.setInt(8, pedido.getEmpresaDeOrigen().getId());
 
-            ps.executeUpdate();
+            stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error al insertar el pedido", e);
         }
     }
 
     @Override
-    public void modificar(Pedido pedido) {
+    public void modificarPedido(Pedido pedido) {
+        /**
+         *                 idPedido,
+         *                 destinatario,
+         *                 fechaCreacion,
+         *                 fechaActualizacion,
+         *                 tarifaEnvio,
+         *                 estado,
+         *                 idDireccion,
+         *                 idEmpresa
+         * */
         String sql = """
                 UPDATE pedido
-                SET destinatario = ?, fechaActualizacion = ?, tarifaEnvio = ?, estado = ?,
-                    idDireccion = ?, placa = ?, idEmpleado = ?, idAdministrador = ?, idEmpresa = ?
+                SET destinatario = ?, fechaCreacion = ?, fechaActualizacion = ?, tarifaEnvio = ?, estado = ?, idEmpresa = ?
                 WHERE idPedido = ?
                 """;
 
@@ -74,8 +120,8 @@ public class PedidoDAOImpl implements PedidoDAO {
     }
 
     @Override
-    public void eliminar(String idPedido) {
-        String sql = "DELETE FROM pedido WHERE id_pedido = ?";
+    public void eliminarPedido(String idPedido) {
+        String sql = "DELETE FROM pedido WHERE idPedido = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, idPedido);
@@ -85,9 +131,10 @@ public class PedidoDAOImpl implements PedidoDAO {
         }
     }
 
+
     @Override
     public Pedido obtenerPorId(String idPedido) {
-        String sql = "SELECT * FROM pedido WHERE id_pedido = ?";
+        String sql = "SELECT * FROM pedido WHERE idPedido = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, idPedido);
@@ -123,7 +170,7 @@ public class PedidoDAOImpl implements PedidoDAO {
     }
 
     @Override
-    public ArrayList<Pedido> listarPorFecha(java.util.Date fecha) {
+    public ArrayList<Pedido> listarPedidosPorFecha(java.util.Date fecha) {
         ArrayList<Pedido> pedidos = new ArrayList<>();
 
         String sql = """
@@ -208,6 +255,10 @@ public class PedidoDAOImpl implements PedidoDAO {
         }
 
         return pedidos;
+    }
+    @Override
+    public ArrayList<Pedido> ordenarPedidosPorFecha(){
+        return null;
     }
 
     private Pedido mapearPedido(ResultSet rs) throws SQLException {
