@@ -29,7 +29,7 @@ public class UsuarioDAOImpl implements UsuarioDAO{
     @Override
     public void agregarUsuarioEmpleado(Empleado empleado){
         String sql = "INSERT INTO empleado (codigoEmpleado, dni, nombres, apellidos, correo," +
-                "contrasenhaHash, telefono, fechaRegistro, estado, cargo, licencia, turno)" +
+                "contrasenaHash, telefono, fechaRegistro, estado, cargo, licencia, turno)" +
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
         java.sql.Date fechaRegistro = new java.sql.Date(empleado.getFechaRegistro().getTime());
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
@@ -46,20 +46,25 @@ public class UsuarioDAOImpl implements UsuarioDAO{
             stmt.setString(11,empleado.getLicencia());
             stmt.setInt(12,empleado.getTurno().ordinal());
             int filasAfectadas = stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                empleado.setIdUsuario(rs.getInt(1));
+            }
             if(filasAfectadas == 1){
                 System.out.println("Se ha agregado un empleado");
             }else{
                 System.out.println("Se han agregado" + filasAfectadas + "empleados");
             }
         }catch(SQLException e){
-                System.out.println("No se ha podido agregar ningún empleado");
+            e.printStackTrace();
+            System.out.println("No se ha podido agregar ningún empleado");
         }
     }
 
     @Override
     public void agregarUsuarioAdministrador(Administrador administrador){
         String sql = "INSERT INTO administrador (codigoEmpleado, dni, nombres, apellidos, correo," +
-                "contrasenhaHash, telefono, fechaRegistro, estado, cargo, nivelDeAcceso, isManager)" +
+                "contrasenaHash, telefono, fechaRegistro, estado, cargo, nivelDeAcceso, isManager)" +
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
         java.sql.Date fechaRegistro = new java.sql.Date(administrador.getFechaRegistro().getTime());
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
@@ -76,6 +81,10 @@ public class UsuarioDAOImpl implements UsuarioDAO{
             stmt.setString(11,administrador.getNivelDeAcceso());
             stmt.setInt(12,administrador.getIsManager()?1:0);
             int filasAfectadas = stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                administrador.setIdUsuario(rs.getInt(1));
+            }
             if(filasAfectadas == 1){
                 System.out.println("Se ha agregado un administrador");
             }else{
@@ -121,7 +130,7 @@ public class UsuarioDAOImpl implements UsuarioDAO{
     @Override
     public void modificarUsuarioEmpleado(int idUsuario, Empleado empleado){
         String sql = "UPDATE empleado SET codigoEmpleado = ?, dni = ?, nombres = ?, apellidos = ?, correo = ?," +
-                "contrasenhaHash = ?, telefono = ?, fechaRegistro = ?, estado = ?, cargo = ?, licencia = ?, turno = ?" +
+                "contrasenaHash = ?, telefono = ?, fechaRegistro = ?, estado = ?, cargo = ?, licencia = ?, turno = ?" +
                 "WHERE idUsuario = ?";
         java.sql.Date fechaRegistro = new java.sql.Date(empleado.getFechaRegistro().getTime());
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
@@ -152,7 +161,7 @@ public class UsuarioDAOImpl implements UsuarioDAO{
     @Override
     public void modificarUsuarioAdministrador(int idUsuario, Administrador administrador){
         String sql = "UPDATE empleado SET codigoEmpleado = ?, dni = ?, nombres = ?, apellidos = ?, correo = ?," +
-                "contrasenhaHash = ?, telefono = ?, fechaRegistro = ?, estado = ?, cargo = ?, nivelDeAcceso = ?, isManager = ?" +
+                "contrasenaHash = ?, telefono = ?, fechaRegistro = ?, estado = ?, cargo = ?, nivelDeAcceso = ?, isManager = ?" +
                 "WHERE idUsuario = ?";
         java.sql.Date fechaRegistro = new java.sql.Date(administrador.getFechaRegistro().getTime());
         try(PreparedStatement stmt = connection.prepareStatement(sql)){
@@ -200,7 +209,7 @@ public class UsuarioDAOImpl implements UsuarioDAO{
                     aux.setNombres(rs.getString("nombres"));
                     aux.setApellidos(rs.getString("apellidos"));
                     aux.setCorreo(rs.getString("correo"));
-                    aux.setContrasenhaHash(rs.getString("contrasenhaHash"));
+                    aux.setContrasenhaHash(rs.getString("contrasenaHash"));
                     aux.setTelefono(rs.getString("telefono"));
                     aux.setFechaRegistro(rs.getDate("fechaRegistro"));
                     aux.setEstado(rs.getBoolean("estado"));
@@ -218,7 +227,7 @@ public class UsuarioDAOImpl implements UsuarioDAO{
                     aux.setNombres(rs.getString("nombres"));
                     aux.setApellidos(rs.getString("apellidos"));
                     aux.setCorreo(rs.getString("correo"));
-                    aux.setContrasenhaHash(rs.getString("contrasenhaHash"));
+                    aux.setContrasenhaHash(rs.getString("contrasenaHash"));
                     aux.setTelefono(rs.getString("telefono"));
                     aux.setFechaRegistro(rs.getDate("fechaRegistro"));
                     aux.setEstado(rs.getBoolean("estado"));

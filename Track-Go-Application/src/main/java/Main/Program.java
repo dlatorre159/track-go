@@ -9,7 +9,6 @@ import Transporte.TransporteDAO;
 import Transporte.TransporteDAOImpl;
 import Pedido.PedidoDAO;
 import Pedido.PedidoDAOImpl;
-
 import java.util.Date;
 import java.util.ArrayList;
 
@@ -168,7 +167,6 @@ public class Program {
             // READ FINAL
             System.out.println("Pedido final:");
             System.out.println(pedidoDAO.obtenerPorId(pedido.getIdPedido()));
-
 
         } finally {
             empresaDAO.EliminarEmpresa(ruc);
