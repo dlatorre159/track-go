@@ -49,7 +49,7 @@ public class Transporte {
 
     @Override
     public String toString() {
-        return "\n-- TRANSPORTE --" +
+        return "-- TRANSPORTE --" +
                 "\nPlaca: " + placa +
                 "\nTipo: " + tipo +
                 "\nMarca: " + marca +

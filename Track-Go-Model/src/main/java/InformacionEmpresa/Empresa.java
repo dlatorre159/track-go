@@ -79,7 +79,7 @@ public class Empresa {
     //CAMBIO??
     @Override
     public String toString() {
-        return "\n--- EMPRESA ---" + "\nID: " + idEmpresa + "\nNombre: " + nombre + "\nRUC: " + ruc + "\nDirección: " + direccion +
+        return "--- EMPRESA ---" + "\nID: " + idEmpresa + "\nNombre: " + nombre + "\nRUC: " + ruc + "\nDirección: " + direccion +
                 "\nSector: " + sector + "\nFecha Fundación: " + fechaFundacion + "\n------";
     }
 }

@@ -47,15 +47,16 @@ public class PedidoDAOImpl implements PedidoDAO {
                 direccion.getReferencia()
         );
 
-        Empresa empresaIngresada = pedido.getEmpresaDeOrigen();
-        Empresa existeEmpresa = EmpresaDAOImpl.getInstance().consultarEmpresa(empresaIngresada.getRuc());
+        Empresa empresaBD = EmpresaDAOImpl.getInstance()
+                .consultarEmpresa(pedido.getEmpresaDeOrigen().getRuc());
 
-        if (existeEmpresa == null) {
-            EmpresaDAOImpl.getInstance().AgregarEmpresa(empresaIngresada);
-            pedido.setEmpresaDeOrigen(empresaIngresada);
-        } else {
-            pedido.setEmpresaDeOrigen(existeEmpresa);
+        if (empresaBD == null) {
+            EmpresaDAOImpl.getInstance().AgregarEmpresa(pedido.getEmpresaDeOrigen());
+            empresaBD = EmpresaDAOImpl.getInstance()
+                    .consultarEmpresa(pedido.getEmpresaDeOrigen().getRuc());
         }
+
+        pedido.setEmpresaDeOrigen(empresaBD);
 
         String sql = """
             INSERT INTO pedido (
@@ -79,7 +80,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             stmt.setDouble(5, pedido.getTarifaEnvio());
             stmt.setString(6, pedido.getEstado().name());
             stmt.setInt(7, idDireccion);
-            stmt.setInt(8, pedido.getEmpresaDeOrigen().getId());
+            stmt.setInt(8, empresaBD.getId());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -108,10 +109,11 @@ public class PedidoDAOImpl implements PedidoDAO {
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, pedido.getDestinatario());
             ps.setDate(2, new Date(pedido.getFechaActualizacion().getTime()));
-            ps.setDouble(3, pedido.getTarifaEnvio());
-            ps.setString(4, pedido.getEstado().name());
-            ps.setInt(5, pedido.getIdUsuario());
-            ps.setString(6, pedido.getIdPedido());
+            ps.setDate(3, new java.sql.Date(pedido.getFechaActualizacion().getTime()));
+            ps.setDouble(4, pedido.getTarifaEnvio());
+            ps.setString(5, pedido.getEstado().name());
+            ps.setInt(6, pedido.getEmpresaDeOrigen().getId());
+            ps.setString(7, pedido.getIdPedido());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -264,13 +266,13 @@ public class PedidoDAOImpl implements PedidoDAO {
     private Pedido mapearPedido(ResultSet rs) throws SQLException {
         Pedido pedido = new Pedido();
 
-        pedido.setIdPedido(rs.getString("id_pedido"));
+        pedido.setIdPedido(rs.getString("idPedido"));
         pedido.setDestinatario(rs.getString("destinatario"));
-        pedido.setFechaCreacion(rs.getDate("fecha_creacion"));
-        pedido.setFechaActualizacion(rs.getDate("fecha_actualizacion"));
-        pedido.setTarifaEnvio(rs.getDouble("tarifa_envio"));
+        pedido.setFechaCreacion(rs.getDate("fechaCreacion"));
+        pedido.setFechaActualizacion(rs.getDate("fechaActualizacion"));
+        pedido.setTarifaEnvio(rs.getDouble("fechaActualizacion"));
         pedido.setEstado(EstadoPedido.valueOf(rs.getString("estado")));
-        pedido.setIdUsuario(rs.getInt("id_usuario"));
+        pedido.setIdUsuario(rs.getInt("idUsuario"));
 
         // Temporalmente null hasta implementar otros DAO
         Direccion direccion = null;
