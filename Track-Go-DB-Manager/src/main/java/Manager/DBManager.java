@@ -1,4 +1,4 @@
-package dbManager;
+package Manager;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -38,9 +38,7 @@ public class DBManager{
     public static DBManager getInstance(){
         if(instance == null){
             synchronized (DBManager.class){
-                if(instance == null){
                     instance = new DBManager();
-                }
             }
         }
         return instance;

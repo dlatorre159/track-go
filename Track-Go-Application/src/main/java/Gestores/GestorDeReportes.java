@@ -1,11 +1,12 @@
 package Gestores;
 
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
-import Pedido.PedidoDAO;
-import InformacionPedido.Pedido;
 import InformacionPedido.EstadoPedido;
+import InformacionPedido.Pedido;
+import Pedido.PedidoDAO;
+
+import java.util.ArrayList;
+import java.util.Date;
+
 
 public class GestorDeReportes {
 
@@ -45,7 +46,7 @@ public class GestorDeReportes {
     }
 
     public String generarReportePedidosPorTransportista(int idUsuario) {
-        ArrayList<Pedido> pedidos = pedidoDAO.listarPorTransportista(idUsuario);
+        ArrayList<Pedido> pedidos = pedidoDAO.listarPorUsuario(idUsuario);
 
         String reporte = "=== REPORTE DE PEDIDOS POR TRANSPORTISTA ===\n";
         reporte += "ID Transportista: " + idUsuario + "\n";

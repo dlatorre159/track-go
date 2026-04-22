@@ -86,6 +86,8 @@ public class Pedido implements Actualizable, Consultable, Trazable{
         this.fechaActualizacion = fechaActualizacion;
     }
 
+    public void setTarifaEnvio(double tarifaEnvio) { this.tarifaEnvio = tarifaEnvio; }
+
     public double getTarifaEnvio(){
         return tarifaEnvio;
     }

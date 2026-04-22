@@ -2,6 +2,7 @@ package InformacionEmpresa;
 import java.util.Date;
 
 public class Empresa {
+    private static int idEmpresa = 0;
     private String nombre;
     private String ruc;
     private String direccion;
@@ -10,6 +11,7 @@ public class Empresa {
 
     public Empresa(String nombre, String ruc, String direccion, String sector,
                    Date fechaFundacion){
+        idEmpresa++;
         this.nombre = nombre;
         this.ruc = ruc;
         this.direccion = direccion;
@@ -23,6 +25,10 @@ public class Empresa {
         this.direccion = empresa.direccion;
         this.sector = empresa.sector;
         this.fechaFundacion = empresa.fechaFundacion;
+    }
+
+    public int getId(){
+        return idEmpresa;
     }
 
     public String getNombre(){

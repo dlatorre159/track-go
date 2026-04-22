@@ -1,6 +1,6 @@
 package Pedido;
 
-import dbManager.DBManager;
+import Manager.DBManager;
 import InformacionEmpresa.Empresa;
 import InformacionPedido.Direccion;
 import InformacionPedido.EstadoPedido;
@@ -105,8 +105,8 @@ public class PedidoDAOImpl implements PedidoDAO {
     }
 
     @Override
-    public List<Pedido> listarTodos() {
-        List<Pedido> pedidos = new ArrayList<>();
+    public ArrayList<Pedido> listarTodos() {
+        ArrayList<Pedido> pedidos = new ArrayList<>();
         String sql = "SELECT * FROM pedido";
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -123,8 +123,32 @@ public class PedidoDAOImpl implements PedidoDAO {
     }
 
     @Override
-    public List<Pedido> listarPorRangoFechas(java.util.Date inicio, java.util.Date fin) {
-        List<Pedido> pedidos = new ArrayList<>();
+    public ArrayList<Pedido> listarPorFecha(java.util.Date fecha) {
+        ArrayList<Pedido> pedidos = new ArrayList<>();
+
+        String sql = """
+            SELECT * FROM pedido
+            WHERE DATE(fecha_creacion) = ?
+            """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setDate(1, new Date(fecha.getTime()));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    pedidos.add(mapearPedido(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return pedidos;
+    }
+
+    @Override
+    public ArrayList<Pedido> listarPorRangoFechas(java.util.Date inicio, java.util.Date fin) {
+        ArrayList<Pedido> pedidos = new ArrayList<>();
         String sql = """
                 SELECT * FROM pedido
                 WHERE fecha_creacion BETWEEN ? AND ?
@@ -147,8 +171,8 @@ public class PedidoDAOImpl implements PedidoDAO {
     }
 
     @Override
-    public List<Pedido> listarPorEstado(EstadoPedido estado) {
-        List<Pedido> pedidos = new ArrayList<>();
+    public ArrayList<Pedido> listarPorEstado(EstadoPedido estado) {
+        ArrayList<Pedido> pedidos = new ArrayList<>();
         String sql = "SELECT * FROM pedido WHERE estado = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -167,8 +191,8 @@ public class PedidoDAOImpl implements PedidoDAO {
     }
 
     @Override
-    public List<Pedido> listarPorUsuario(int idUsuario) {
-        List<Pedido> pedidos = new ArrayList<>();
+    public ArrayList<Pedido> listarPorUsuario(int idUsuario) {
+        ArrayList<Pedido> pedidos = new ArrayList<>();
         String sql = "SELECT * FROM pedido WHERE id_usuario = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
