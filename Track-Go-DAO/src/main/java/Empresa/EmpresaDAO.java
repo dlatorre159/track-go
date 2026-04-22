@@ -6,4 +6,5 @@ public interface EmpresaDAO {
     void EliminarEmpresa(String ruc);
     void ModificarEmpresa(String ruc, Empresa empresa);
     Empresa consultarEmpresa(String ruc);
+    Empresa obtenerPorId(int idEmpresa);
 }

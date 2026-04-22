@@ -117,4 +117,42 @@ public class EmpresaDAOImpl implements EmpresaDAO {
             return null;
         }
     }
+    @Override
+    public Empresa obtenerPorId(int idEmpresa) {
+
+        String sql = """
+        SELECT idEmpresa, nombre, ruc, direccion, sector, fechaFundacion
+        FROM empresa
+        WHERE idEmpresa = ?
+    """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setInt(1, idEmpresa);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println("No existe la empresa con id: " + idEmpresa);
+                return null;
+            }
+
+            int id = rs.getInt(1);
+            String nombre = rs.getString(2);
+            String rucDb = rs.getString(3);
+            String direccion = rs.getString(4);
+            String sector = rs.getString(5);
+            java.sql.Date fecha = rs.getDate(6);
+
+            Empresa empresa = new Empresa(nombre, rucDb, direccion, sector, fecha);
+            empresa.setId(id);
+
+            return empresa;
+
+        } catch (SQLException e) {
+            System.out.println("Error al obtener empresa por id: " + e.getMessage());
+        }
+
+        return null;
+    }
 }

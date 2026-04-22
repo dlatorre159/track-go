@@ -321,9 +321,24 @@ public class PedidoDAOImpl implements PedidoDAO {
 
         pedido.setIdUsuario(rs.getInt("idEmpleado"));
 
-        // Por ahora null
-        pedido.setDireccion(null);
-        pedido.setEmpresaDeOrigen(null);
+        // Direccion
+        int idDireccion = rs.getInt("idDireccion");
+        if (!rs.wasNull()) {
+            Direccion direccion = DireccionDAOImpl.getInstance()
+                    .obtenerPorId(idDireccion);
+            pedido.setDireccion(direccion);
+        } else {
+            pedido.setDireccion(null);
+        }
+        //Empresa
+        int idEmpresa = rs.getInt("idEmpresa");
+        if (!rs.wasNull()) {
+            Empresa empresa = EmpresaDAOImpl.getInstance()
+                    .obtenerPorId(idEmpresa);
+            pedido.setEmpresaDeOrigen(empresa);
+        } else {
+            pedido.setEmpresaDeOrigen(null);
+        }
 
         String placa = rs.getString("placa");
         if (placa != null) {

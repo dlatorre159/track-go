@@ -1,5 +1,6 @@
 package Direccion;
 
+import InformacionPedido.Direccion;
 import Manager.DBManager;
 
 import java.sql.Connection;
@@ -74,4 +75,39 @@ public class DireccionDAOImpl implements DireccionDAO{
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public Direccion obtenerPorId(int idDireccion) {
+
+        String sql = """
+        SELECT departamento, provincia, distrito, codPostal, calleNumero, referencia
+        FROM direccion
+        WHERE idDireccion = ?
+    """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setInt(1, idDireccion);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {
+                    return new Direccion(
+                            rs.getString("departamento"),
+                            rs.getString("provincia"),
+                            rs.getString("distrito"),
+                            rs.getString("codPostal"),
+                            rs.getString("calleNumero"),
+                            rs.getString("referencia")
+                    );
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error al obtener direccion por id: " + e.getMessage());
+        }
+        return null;
+    }
+
 }
+
