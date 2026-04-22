@@ -21,36 +21,36 @@ public class Program {
 
         String ruc="123456789";
 
-        //try{
-        //    //CREATE
-        //    Empresa empresa=new Empresa("EmpresitaFantasma",
-        //            ruc,
-        //            "Av. Narnia 12",
-        //            "Ola",
-        //            new Date());
-        //
-        //    empresaDAO.AgregarEmpresa(empresa);
-        //    System.out.println("Se creo la empresita: "+empresa.getRuc());
+        try{
+            //CREATE
+            Empresa empresa=new Empresa("EmpresitaFantasma",
+                    ruc,
+                    "Av. Narnia 12",
+                    "Ola",
+                    new Date());
 
-//            //READ
-//            Empresa empresaBD=empresaDAO.consultarEmpresa(ruc);
-//            System.out.println(empresaBD);
-//
-//            //UPDATE
-//            empresa.setNombre("Emprestia Fantasmona cambiada");
-//            empresa.setDireccion("Av. Nueva vida 2000");
-//
-//            empresaDAO.ModificarEmpresa(ruc,empresa);
-//            System.out.println("Empresa actualizada");
-//            //OTRO READ
-//            System.out.println("Empresa después del update:");
-//            System.out.println(empresaDAO.consultarEmpresa(ruc));
-//
-//        } finally {
-//            empresaDAO.EliminarEmpresa(ruc);
-//
-//            System.out.println("Limpieza Completada");
-//        }
+            empresaDAO.AgregarEmpresa(empresa);
+            System.out.println("Se creo la empresita: "+empresa.getRuc());
+
+            //READ
+            Empresa empresaBD=empresaDAO.consultarEmpresa(ruc);
+            System.out.println(empresaBD);
+
+            //UPDATE
+            empresa.setNombre("Emprestia Fantasmona cambiada");
+            empresa.setDireccion("Av. Nueva vida 2000");
+
+            empresaDAO.ModificarEmpresa(ruc,empresa);
+            System.out.println("Empresa actualizada");
+            //OTRO READ
+            System.out.println("Empresa después del update:");
+            System.out.println(empresaDAO.consultarEmpresa(ruc));
+
+        } finally {
+            empresaDAO.EliminarEmpresa(ruc);
+
+            System.out.println("Limpieza Completada");
+        }
 
         TransporteDAO transporteDAO = TransporteDAOImpl.getInstance();
         String placa= "TRR-001";
